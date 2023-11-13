@@ -65,6 +65,6 @@ Endpoint Returned Codes:
           code="500" Server error
 
 ### Tenologies
-- Visual Studio Community 2022
+- Visual Studio 2022
 - .Net 6
 
