@@ -71,10 +71,10 @@ namespace CsvFileApi.Controllers
 
                         var user = new User
                         {
-                            Name = values[0],
-                            City = values[1],
-                            Country = values[2],
-                            FavoriteSport = values[3]
+                            name = values[0],
+                            city = values[1],
+                            country = values[2],
+                            favorite_sport = values[3]
                         };
 
                         _users.Add(user);

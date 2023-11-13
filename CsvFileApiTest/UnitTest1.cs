@@ -1,5 +1,9 @@
 using CsvFileApi.Models;
 using Newtonsoft.Json;
+using System;
+using System.Reflection.Metadata;
+using System.Web;
+using System.Xml.Linq;
 
 namespace CsvFileApiTest
 {
@@ -68,8 +72,8 @@ namespace CsvFileApiTest
 
             Assert.That((int)response.StatusCode, Is.EqualTo(200));
             Assert.That(dados.Count, Is.EqualTo(1));
-            Assert.That(dados[0].City, Is.EqualTo("Paris"));
-            Assert.That(dados[0].Country, Is.EqualTo("France"));
+            Assert.That(dados[0].city, Is.EqualTo("Paris"));
+            Assert.That(dados[0].country, Is.EqualTo("France"));
             Assert.Pass();
         }
 
@@ -83,10 +87,10 @@ namespace CsvFileApiTest
 
             Assert.That((int)response.StatusCode, Is.EqualTo(200));
             Assert.That(dados.Count, Is.EqualTo(2));
-            Assert.That(dados[0].City, Is.EqualTo("New York"));
-            Assert.That(dados[0].Country, Is.EqualTo("USA"));
-            Assert.That(dados[1].City, Is.EqualTo("Paris"));
-            Assert.That(dados[1].Country, Is.EqualTo("France"));
+            Assert.That(dados[0].city, Is.EqualTo("New York"));
+            Assert.That(dados[0].country, Is.EqualTo("USA"));
+            Assert.That(dados[1].city, Is.EqualTo("Paris"));
+            Assert.That(dados[1].country, Is.EqualTo("France"));
             Assert.Pass();
         }
 
@@ -100,23 +104,123 @@ namespace CsvFileApiTest
 
             Assert.That((int)response.StatusCode, Is.EqualTo(200));
             Assert.That(dados.Count, Is.EqualTo(2));
-            Assert.That(dados[0].City, Is.EqualTo("New York"));
-            Assert.That(dados[0].Country, Is.EqualTo("USA"));
-            Assert.That(dados[1].City, Is.EqualTo("Sydney"));
-            Assert.That(dados[1].Country, Is.EqualTo("Australia"));
+            Assert.That(dados[0].city, Is.EqualTo("New York"));
+            Assert.That(dados[0].country, Is.EqualTo("USA"));
+            Assert.That(dados[1].city, Is.EqualTo("Sydney"));
+            Assert.That(dados[1].country, Is.EqualTo("Australia"));
             Assert.Pass();
         }
 
         [Test]
         public async Task Test5()
         {
-            var url = _baseUrl + "/api/Users?q=name:Tom Brown+country:usa";
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:Tom Brown+country:usa");
             var response = await _httpClient.GetAsync(url);
             var jsonContent = await response.Content.ReadAsStringAsync();
             var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
 
             Assert.That((int)response.StatusCode, Is.EqualTo(200));
             Assert.That(dados.Count, Is.EqualTo(0));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test6()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:*Brown+country:Au*");
+            var response = await _httpClient.GetAsync(url);
+            var jsonContent = await response.Content.ReadAsStringAsync();
+            var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(200));
+            Assert.That(dados.Count, Is.EqualTo(1));
+            Assert.That(dados[0].city, Is.EqualTo("Sydney"));
+            Assert.That(dados[0].country, Is.EqualTo("Australia"));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test7()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:Tom*+country:*lia");
+            var response = await _httpClient.GetAsync(url);
+            var jsonContent = await response.Content.ReadAsStringAsync();
+            var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(200));
+            Assert.That(dados.Count, Is.EqualTo(1));
+            Assert.That(dados[0].city, Is.EqualTo("Sydney"));
+            Assert.That(dados[0].country, Is.EqualTo("Australia"));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test8()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:* *");
+            var response = await _httpClient.GetAsync(url);
+            var jsonContent = await response.Content.ReadAsStringAsync();
+            var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(200));
+            Assert.That(dados.Count, Is.EqualTo(6));
+            Assert.That(dados[0].city, Is.EqualTo("New York"));
+            Assert.That(dados[0].country, Is.EqualTo("USA"));
+            Assert.That(dados[4].city, Is.EqualTo("Sydney"));
+            Assert.That(dados[4].country, Is.EqualTo("Australia"));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test9()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:T* *B*n");
+            var response = await _httpClient.GetAsync(url);
+            var jsonContent = await response.Content.ReadAsStringAsync();
+            var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(200));
+            Assert.That(dados.Count, Is.EqualTo(1));
+            Assert.That(dados[0].city, Is.EqualTo("Sydney"));
+            Assert.That(dados[0].country, Is.EqualTo("Australia"));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test10()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:T* *B*n|city:t*");
+            var response = await _httpClient.GetAsync(url);
+            var jsonContent = await response.Content.ReadAsStringAsync();
+            var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(200));
+            Assert.That(dados.Count, Is.EqualTo(2));
+            Assert.That(dados[0].city, Is.EqualTo("Tokyo"));
+            Assert.That(dados[0].country, Is.EqualTo("Japan"));
+            Assert.That(dados[1].city, Is.EqualTo("Sydney"));
+            Assert.That(dados[1].country, Is.EqualTo("Australia"));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test11()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:j*+country:u*+favorite_sport:*ball");
+            var response = await _httpClient.GetAsync(url);
+            var jsonContent = await response.Content.ReadAsStringAsync();
+            var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(200));
+            Assert.That(dados.Count, Is.EqualTo(2));
+            Assert.That(dados[0].name, Is.EqualTo("John Doe"));
+            Assert.That(dados[0].city, Is.EqualTo("New York"));
+            Assert.That(dados[0].country, Is.EqualTo("USA"));
+            Assert.That(dados[0].favorite_sport, Is.EqualTo("Basketball"));
+            Assert.That(dados[1].city, Is.EqualTo("London"));
+            Assert.That(dados[1].country, Is.EqualTo("UK"));
+            Assert.That(dados[1].favorite_sport, Is.EqualTo("Football"));
+            Assert.That(dados[1].name, Is.EqualTo("Jane Smith"));
             Assert.Pass();
         }
     }

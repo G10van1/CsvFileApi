@@ -2,12 +2,12 @@ namespace CsvFileApi.Models
 {
     public class User
     {
-        public string? Name { get; set; }
+        public string? name { get; set; }
 
-        public string? City { get; set; }
+        public string? city { get; set; }
 
-        public string? Country { get; set; }
+        public string? country { get; set; }
 
-        public string? FavoriteSport { get; set; }
+        public string? favorite_sport { get; set; }
     }
 }
