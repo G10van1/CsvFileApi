@@ -223,5 +223,36 @@ namespace CsvFileApiTest
             Assert.That(dados[1].name, Is.EqualTo("Jane Smith"));
             Assert.Pass();
         }
+
+
+        [Test]
+        public async Task Test12()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("city:London|country:usa+country:uk");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test13()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("city|country");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test14()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("cty:London");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
     }
 }

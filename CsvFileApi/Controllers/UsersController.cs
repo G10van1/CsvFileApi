@@ -36,7 +36,12 @@ namespace CsvFileApi.Controllers
                 if (string.IsNullOrWhiteSpace(q))
                     return Ok(_users);
 
-                string condition = Service.QueryApi2Linq(q);
+                int status;
+                string message;
+                string condition = Service.QueryApi2Linq(q, out status, out message);
+
+                if (status == 400)
+                    return StatusCode(400, new { messageError = message });
 
                 var filteredUsers = _users
                     .AsQueryable()
