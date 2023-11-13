@@ -1,7 +1,7 @@
 # CsvFileApi
 Get list of users from a CSV file.
 
-## Instruction
+## Instructions
 There are two project, the main project is a WEB API to upload a CSV file and search using query commands. The second project run unity tests on the WEB API. It is possible use the Swagger UI on url "https://localhost:5001/swagger/index.html". Use the Visual Studio 2022 to load and run the project. To run the main project use "dotnet run --project CsvFileApi.csproj" on command prompt. The test project is called using "dotnet test CsvFileApiTest.dll". To have a more user-friendly experience, it is recommended to use Test Manager tool in Visual Studio to run the test project.
 
 ### Post Endpoint (/api/Files)
