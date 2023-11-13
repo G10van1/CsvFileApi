@@ -7,6 +7,9 @@ using CsvFileApi.Services;
 
 namespace CsvFileApi.Controllers
 {
+    /// <summary>
+    /// Users Controller
+    /// </summary>
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -20,7 +23,32 @@ namespace CsvFileApi.Controllers
         {
             _logger = logger;
         }
-        
+
+        /// <summary>
+        /// Get list of users
+        /// </summary>
+        /// <remarks>
+        /// It must choose the the parameters to find users. Use q field to insert commands
+        ///
+        /// It is possible insert searches by key and value, use ':' to separate the key and value.
+        /// For example: ?q=name:Mary
+        /// It return all users where the name is equal to Mary.
+        ///
+        /// It is possible use '+' (and comparator) and '|' (or comparator) to join more than
+        /// one field on the search. Just a warning, don't mix '+' and '-' at the same query,
+        /// it's not possible.
+        /// For example: ?q=name:Mary+city:London
+        ///              ?q=name:Mary|city:London
+        ///
+        /// It is possible split the values on the search. Use the '*' to split the search string.
+        /// For example:?q=name:A*b*c
+        /// Return all users where the name starts with 'A', contains 'B' and ends with 'c'.
+        /// The values are no case sensitive.
+        /// 
+        /// </remarks>
+        /// <response code="200">Returns the list of the users</response>
+        /// <response code="400">If the parameter q is invalid</response>
+        /// <response code="500">If server error</response> 
         [HttpGet]
         [Route("api/Users/")]
         public IActionResult GetUsers([FromQuery] string? q)
@@ -56,6 +84,12 @@ namespace CsvFileApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Upload the CSV file
+        /// </summary>
+        /// <remarks>
+        /// Use the "/api/Files" endpoint to upload the CSV file.
+        /// </remarks>
         [HttpPost]
         [Route("api/Files/")]
         public IActionResult UploadFile(IFormFile file)
