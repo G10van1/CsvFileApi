@@ -2,14 +2,32 @@
 {
     public class Service
     {
-        public static string QueryApi2Linq(string input)
+        public static string QueryApi2Linq(string input, out int status, out string message)
         {
+            status = 200;
+            message = "Successful!";
             string[] separators = { "+", "|" };
+
+            if (!QueryValidation(input, separators, out message))
+            {
+                status = 400;
+                return message;
+            }
+
             string[] splited = input.Split(separators, StringSplitOptions.None);
             string queryLinq = "u => ";
+
             foreach (string x in splited)
             {
                 var field = x.Split(":", StringSplitOptions.None);
+
+                if (!FieldValidation(field[0]))
+                {
+                    status = 400;
+                    message = "Invalid field " + field[0];
+                    return message;
+                }
+
                 int index = input.IndexOf(x);
                 
                 if (index != 0)
@@ -17,7 +35,6 @@
                 
                 queryLinq += SplitSubQuery(field[0], field[1]);
             }
-
             return queryLinq;
         }
 
@@ -59,7 +76,27 @@
 
             return subQuery;
         }
+        private static bool FieldValidation(string field)
+        {
+            return "name,city,country,favorite_sport".Contains(field);
+        }
 
+        private static bool QueryValidation(string query, string[] separators, out string message)
+        {
+            message = "Successful!";
+            if (query.Contains(separators[0]) && query.Contains(separators[1]))
+            {
+                message = "It is not allowed to mix '+' and '|' in the same query!";
+                return false;
+            }
 
+            if (!query.Contains(":"))
+            {
+                message = "It must have at least one ':'!";
+                return false;
+            }
+
+            return true;
+        }
     }
 }
