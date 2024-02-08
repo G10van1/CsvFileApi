@@ -56,7 +56,7 @@ namespace CsvFileApiTest
 
                 var response = await _httpClient.PostAsync(url, content);
 
-                Assert.That((int)response.StatusCode, Is.EqualTo(200));
+                Assert.That((int)response.StatusCode, Is.EqualTo(201));
             }
 
             Assert.Pass();
@@ -65,7 +65,7 @@ namespace CsvFileApiTest
         [Test]
         public async Task Test2()
         {
-            var url = _baseUrl + "/api/Users?q=city:paris";
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("city:paris");
             var response = await _httpClient.GetAsync(url);
             var jsonContent = await response.Content.ReadAsStringAsync();
             var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
@@ -80,7 +80,7 @@ namespace CsvFileApiTest
         [Test]
         public async Task Test3()
         {
-            var url = _baseUrl + "/api/Users?q=city:paris|country:usa";
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("city:paris|country:usa");
             var response = await _httpClient.GetAsync(url);
             var jsonContent = await response.Content.ReadAsStringAsync();
             var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
@@ -97,7 +97,7 @@ namespace CsvFileApiTest
         [Test]
         public async Task Test4()
         {
-            var url = _baseUrl + "/api/Users?q=name:Tom Brown|country:usa";
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:Tom Brown|country:usa");
             var response = await _httpClient.GetAsync(url);
             var jsonContent = await response.Content.ReadAsStringAsync();
             var dados = JsonConvert.DeserializeObject<List<User>>(jsonContent);
@@ -249,6 +249,66 @@ namespace CsvFileApiTest
         public async Task Test14()
         {
             var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("cty:London");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test15()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("city,:London");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test16()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name|city:London");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test17()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:J*||city:London");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test18()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:J*|city:London|country:");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test19()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:*");
+            var response = await _httpClient.GetAsync(url);
+
+            Assert.That((int)response.StatusCode, Is.EqualTo(400));
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task Test20()
+        {
+            var url = _baseUrl + "/api/Users?q=" + Uri.EscapeDataString("name:*n:*e|city|country:*J");
             var response = await _httpClient.GetAsync(url);
 
             Assert.That((int)response.StatusCode, Is.EqualTo(400));

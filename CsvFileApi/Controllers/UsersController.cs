@@ -28,27 +28,47 @@ namespace CsvFileApi.Controllers
         /// Get list of users
         /// </summary>
         /// <remarks>
-        /// It must choose the the parameters to find users. Use q field to insert commands
+        /// You can choose the parameters to find users. Use "q" field to insert parameters.
+        /// 
+        /// If the “q” parameter is empty, the query will return all registered users.
+        /// 
+        /// 
+        /// It is possible to enter searches by key and value, use ':' to separate key and value.
         ///
-        /// It is possible insert searches by key and value, use ':' to separate the key and value.
-        /// For example: ?q=name:Mary
-        /// It return all users where the name is equal to Mary.
+        /// 
+        /// Example:
+        /// 
+        ///              ?q=name:Mary
         ///
-        /// It is possible use '+' (and comparator) and '|' (or comparator) to join more than
-        /// one field on the search. Just a warning, don't mix '+' and '-' at the same query,
-        /// it's not possible.
-        /// For example: ?q=name:Mary+city:London
+        /// 
+        /// This query returns all users whose name is the same as Mary.
+        ///
+        /// 
+        /// It is possible to use '+' (and operator) and '|' (or operator) to enter more than
+        /// a field in the search. Just a warning, don't mix '+' and '|' in the same query,
+        /// not allowed.
+        /// 
+        /// Example:
+        /// 
+        ///              ?q=name:Mary+city:London
+        /// 
         ///              ?q=name:Mary|city:London
+        /// 
+        /// It is possible split the values in the search. Use the '*' to split the search string.
+        /// 
+        /// Example:
+        /// 
+        ///              ?q=name:A*b*c
+        /// 
+        /// This query returns all users whose name starts with 'A', contains 'b' and ends with 'c'.
         ///
-        /// It is possible split the values on the search. Use the '*' to split the search string.
-        /// For example:?q=name:A*b*c
-        /// Return all users where the name starts with 'A', contains 'B' and ends with 'c'.
-        /// The values are no case sensitive.
+        ///  
+        /// The values are case insensitive.
         /// 
         /// </remarks>
-        /// <response code="200">Returns the list of the users</response>
-        /// <response code="400">If the parameter q is invalid</response>
-        /// <response code="500">If server error</response> 
+        /// <response code="200">Success, returns the filtered list of the users</response>
+        /// <response code="400">Invalid "q" parameter</response>
+        /// <response code="500">Server error</response> 
         [HttpGet]
         [Route("api/Users/")]
         public IActionResult GetUsers([FromQuery] string? q)
@@ -90,6 +110,8 @@ namespace CsvFileApi.Controllers
         /// <remarks>
         /// Use the "/api/Files" endpoint to upload the CSV file.
         /// </remarks>
+        /// <response code="201">Successful file upload</response>
+        /// <response code="500">Server error</response>
         [HttpPost]
         [Route("api/Files/")]
         public IActionResult UploadFile(IFormFile file)
@@ -122,13 +144,12 @@ namespace CsvFileApi.Controllers
                     System.IO.File.WriteAllText(FilePath, JsonConvert.SerializeObject(_users));
                 }
 
-                return Ok("CSV file uploaded successfully!");
+                return CreatedAtAction( null , new { fileName = file.FileName }, null);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { messageError = ex.Message });
             }
         }
-
     }
 }
