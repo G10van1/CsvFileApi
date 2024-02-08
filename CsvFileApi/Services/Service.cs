@@ -19,12 +19,19 @@
 
             foreach (string x in splited)
             {
+                if (x.Count(c => c == ':') != 1)
+                {
+                    status = 400;
+                    message = "Invalid query format, must have only one ':' in each subquery";
+                    return message;
+                }
+
                 var field = x.Split(":", StringSplitOptions.None);
 
                 if (!FieldValidation(field[0]))
                 {
                     status = 400;
-                    message = "Invalid field " + field[0];
+                    message = $"Invalid field name: '{field[0]}'";
                     return message;
                 }
 
@@ -78,7 +85,7 @@
         }
         private static bool FieldValidation(string field)
         {
-            return "name,city,country,favorite_sport".Contains(field);
+            return new[] { "name", "city", "country", "favorite_sport" }.Contains(field.TrimEnd().TrimStart());
         }
 
         private static bool QueryValidation(string query, string[] separators, out string message)
@@ -86,13 +93,35 @@
             message = "Successful!";
             if (query.Contains(separators[0]) && query.Contains(separators[1]))
             {
-                message = "It is not allowed to mix '+' and '|' in the same query!";
+                message = "It is not allowed to mix '+' and '|' in the same query";
                 return false;
             }
 
             if (!query.Contains(":"))
             {
-                message = "It must have at least one ':'!";
+                message = "It must have at least a ':'";
+                return false;
+            }
+            
+            int numSeparators = query.Count(c => c == separators[0][0] || c == separators[1][0]);
+            int numFieldSeparator = query.Count(c => c == ':') - 1;
+            if (numSeparators != numFieldSeparator)
+            {
+                message = "Invalid query format";
+                return false;
+            }
+
+            if (query.Contains("++") || query.Contains("::") || query.Contains("||")
+                || query.Contains("**") || query.Contains(":+") || query.Contains("+:")
+                || query.Contains(":|") || query.Contains("|:"))
+            {
+                message = "Invalid query format";
+                return false;
+            }
+
+            if ("+|:".Contains(query[0]) || "+|:".Contains(query[^1]) || query[^2..] == ":*")
+            {
+                message = "Invalid query format";
                 return false;
             }
 
