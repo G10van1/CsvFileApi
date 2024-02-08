@@ -1,12 +1,13 @@
 # CsvFileApi
-Get list of users from a CSV file.
+Query a list of users from a CSV file using query filters.
 
 ## Instructions
-There are two project, the main project is a WEB API to upload a CSV file and search using query commands. The second project run unity tests on the WEB API. It is possible use the Swagger UI on url "https://localhost:5001/swagger/index.html". Use the Visual Studio 2022 to load and run the project. To run the main project use "dotnet run --project CsvFileApi.csproj" on command prompt. The test project is called using "dotnet test CsvFileApiTest.dll". To have a more user-friendly experience, it is recommended to use Test Manager tool in Visual Studio to run the test project.
+There are two projects, the main project is a WEB API for uploading a CSV file and searching using query commands. The second project runs unit tests on the WEB API. You can use the Swagger UI at the url "https://localhost:5001/swagger/index.html". Use Visual Studio 2022 to load and run the project. To run the main project, use "dotnet run --project CsvFileApi.csproj" in the command prompt. The test project is called using "dotnet test CsvFileApiTest.dll". For a more user-friendly experience, it is recommended to use the Test Manager tool in Visual Studio to run the test project.
 
 ### Post Endpoint (/api/Files)
 Use the "/api/Files" endpoint to upload the CSV file.
-The first test (Test1) on the Test project do this operation.
+The first test (Test1) in this test project performs this operation.
+
 File sample:
 
           name,city,country,favorite_sport
@@ -23,22 +24,29 @@ File sample:
           
           Emma Wilson,Berlin,Germany,Basketball
 
+Endpoint Returned Codes:
+
+          code="201" Successful file upload
+          
+          code="500" Server error
+
 ### Get Endpoint (/api/Users)
-It must choose the the parameters to find users. Use q field to insert commands.
 
-If the q value is empty it will return all users inserted.
+You must choose the parameters to find users. Use the q field to enter query commands.
 
-It is possible use searches by key and value, use ':' to separate the key and value.
+If the q value is empty, it will return all entered users.
+
+It is possible to use searches by key and value, use ':' to separate the key and value.
 
 Example: 
 
             ?q=name:Mary
 
-It return all users where the name is equal to Mary.
+Returns all users where the name is the same as Mary.
 
-It is possible use '+' (and comparator) and '|' (or comparator) to join more than
-one field on the search. Just a warning, don't mix '+' and '-' at the same query,
-it's not possible.
+It is possible to use '+' (and comparator) and '|' (or comparator) to join more than
+a field in the search. Just a warning, don't mix '+' and '-' in the same query,
+this is not allowed.
 
 Example: 
 
@@ -46,15 +54,15 @@ Example:
 
              ?q=name:Mary|city:London
 
-It is possible split the values on the search. Use the '*' to split the search string.
+You can split the values in the search. Use the '*' character to split the search string.
 
 Example:
 
              ?q=name:A*b*c
              
-It return all users where the name starts with 'A', contains 'b' and ends with 'c'.
+This query returns all users whose name starts with 'A', contains 'b' and ends with 'c'.
 
-The values are no case sensitive.
+The values are case insensitive.
 
 Endpoint Returned Codes:
 
