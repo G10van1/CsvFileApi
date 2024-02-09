@@ -19,10 +19,7 @@ namespace CsvFileApi.Controllers
 
         private readonly ILogger<UsersController> _logger;
 
-        public UsersController(ILogger<UsersController> logger)
-        {
-            _logger = logger;
-        }
+        public UsersController(ILogger<UsersController> logger) => _logger = logger;
 
         /// <summary>
         /// Get list of users
@@ -128,15 +125,9 @@ namespace CsvFileApi.Controllers
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
-                        var values = line.Split(',');
+                        string[] values = line.Split(',');
 
-                        var user = new User
-                        {
-                            name = values[0],
-                            city = values[1],
-                            country = values[2],
-                            favorite_sport = values[3]
-                        };
+                        var user = new User(values[0], values[1], values[2], values[3]);
 
                         _users.Add(user);
                     }
